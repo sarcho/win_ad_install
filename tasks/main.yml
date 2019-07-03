@@ -1,0 +1,17 @@
+---
+# tasks file for win_ad_install
+- name: Ensure AD-Domain-Services are installed
+  win_feature:
+    name: AD-Domain-Services
+    state: present
+  register: ad_domain_services
+
+- name: Setup Windows Domain
+  win_domain:
+    dns_domain_name: "ad1.{{ GUID }}.example.opentlc.com"
+    safe_mode_password: "{{ ansible_password }}"
+  register: setup_domain
+
+- name: Reboot Windows System
+  win_reboot:
+  when: ad_domain_services is succeeded and setup_domain.reboot_required #setup_domain.changed
